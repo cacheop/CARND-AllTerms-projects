@@ -25,23 +25,42 @@ prev_image_array = None
 # crop bottom 25 pixels + crop 33.3% of image top (scenery above road) + resize it to 64 x 64
 import math
 import cv2
+from random import random
+
+IMAGE_W_H = 64
+
+
+def convert_color_image(img):
+    img = cv2.cvtColor(img,cv2.COLOR_BGR2YUV)
+
+    return img
+
+
+def modify_brightness(img):
+    #img = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
+    img = np.array(img, dtype = np.float64)
+    brightness_multiplier = 0.2
+    random_bright = brightness_multiplier+np.random.uniform()
+    img[:,:,2] = img[:,:,2]*random_bright
+    img[:,:,2][img[:,:,2]>255] = 255
+    img = np.array(img, dtype = np.uint8)
+    #
+    #img = cv2.cvtColor(img, cv2.COLOR_HSV2BGR)
+    
+    return img
+
 
 def crop_resize_image(img):
     shape = img.shape
-    img = img[math.floor(shape[0]/3):shape[0]-25, 0:shape[1]]
-    img = cv2.resize(img, (64, 64), interpolation=cv2.INTER_AREA)    
-    return img
-
-def convert_color_image(img):
-    img = cv2.GaussianBlur(img, (3,3), 0)
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2YUV)
+    img = img[math.floor(shape[0]/2.5):shape[0]-20, 0:shape[1]]
+    img = cv2.resize(img, (IMAGE_W_H, IMAGE_W_H), interpolation=cv2.INTER_AREA)    
     return img
 
 def process_image(img):
-    img = convert_color_image(img)
+    #img = convert_color_image(img)
+    #img = modify_brightness(img)
     img = crop_resize_image(img)
     return img
-
 
 
 
@@ -91,7 +110,6 @@ def telemetry(sid, data):
         # crop & resize like we did for training data
 
         image_array = process_image(image_array)
-        print("0")
         
         steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
         throttle = controller.update(float(speed))
