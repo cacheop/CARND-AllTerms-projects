@@ -22,6 +22,9 @@ using std::vector;
     
     // jacobian
     Hj_ = MatrixXd(3, 4);
+    Hj_ << 1,0,0,0,
+    0,1,0,0,
+    0,0,1,0;
     
     //measurement covariance matrices
     //laser
@@ -44,6 +47,10 @@ using std::vector;
         
     //state covariance matrix P
     ekf_.P_ = MatrixXd(4, 4);
+    ekf_.P_ <<  1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1000, 0,
+                0, 0, 0, 1000;
     
     //transition matrix F_
     ekf_.F_ = MatrixXd(4, 4);
@@ -74,7 +81,7 @@ void FusionEKF::Init(const MeasurementPackage &measurement_pack) {
     ekf_.x_ << 1, 1, 1, 1;
     
     // position and velocity
-    float px = 0, py = 0, vx = 0, vy = 0;
+    float px = 0, py = 0, vx = 0.5, vy = 0.5;
     
    // radar data
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
@@ -158,7 +165,6 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     VectorXd z_pred;
     switch (measurement_pack.sensor_type_) {
         case MeasurementPackage::RADAR:
-            std::cout << "RADAR" << std::endl;
             try {
                 ekf_.H_ = tools.CalculateJacobian(ekf_.x_);
                 ekf_.R_ = R_radar_;
@@ -168,7 +174,6 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
             }
             break;
         case MeasurementPackage::LASER:
-            std::cout << "LASER" << std::endl;
             ekf_.H_ = H_laser_;
             ekf_.R_ = R_laser_;
             z_pred = ekf_.LaserUpdate();

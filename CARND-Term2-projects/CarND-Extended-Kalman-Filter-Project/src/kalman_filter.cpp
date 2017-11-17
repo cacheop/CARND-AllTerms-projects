@@ -8,6 +8,7 @@ using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
 
+
 KalmanFilter::KalmanFilter() {}
 
 KalmanFilter::~KalmanFilter() {}
@@ -31,14 +32,18 @@ VectorXd KalmanFilter::RadarUpdate() {
 
     // convert Cartesian back to Polar
     float rho = sqrt(px*px + py*py);
+    float phi = atan2(py, px);
+    float rho_dot;
     
     //check division by zero
-    if (rho < .00001) {
-        rho = sqrt(.001 * .001 + .001 * .001);
+    if (fabs(rho) < .00001) {
+        rho_dot = 0;
+        std::cout << "whoa!" << std::endl;
+
     }
-    
-    float phi = atan2(py, px);
-    float rho_dot = (px*vx + py*vy)/sqrt(px*px + py*py);
+    else {
+        rho_dot = (px*vx + py*vy)/rho;
+    }
 
     // predicted state vector
     VectorXd z_pred = VectorXd(3);
@@ -57,6 +62,8 @@ void KalmanFilter::Update(const VectorXd &z, const VectorXd &z_pred) {
     
     // predicted error
     VectorXd y = z - z_pred;
+    
+    y[1] = atan2(sin(y[1]), cos(y[1]));
     
     // new state matrix using Kalman gain
     x_ = x_ + (K * y);
