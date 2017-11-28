@@ -171,7 +171,7 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 }
 
 /////////////////////////////////////////////////////////////
-//ring angle value to range [-PI, PI]
+// Adjust angle value to range [-PI, PI]
 /////////////////////////////////////////////////////////////
 double UKF::NormalizeAngle(double angle) {
     
