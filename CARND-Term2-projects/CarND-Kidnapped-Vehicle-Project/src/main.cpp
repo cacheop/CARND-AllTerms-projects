@@ -38,7 +38,12 @@ int main()
 
   // Read map data
   Map map;
-  if (!read_map_data("../data/map_data.txt", map)) {
+    //@@@ ORIGINAL CODE
+    //if (!read_map_data("../data/map_data.txt", map)) {
+    //
+    
+    
+    if (!read_map_data("../../data/map_data.txt", map)) {
 	  cout << "Error: Could not open map file" << endl;
 	  return -1;
   }
@@ -63,22 +68,19 @@ int main()
         
         if (event == "telemetry") {
           // j[1] is the data JSON object
-
-
+            
           if (!pf.initialized()) {
 
           	// Sense noisy position data from the simulator
 			double sense_x = std::stod(j[1]["sense_x"].get<std::string>());
 			double sense_y = std::stod(j[1]["sense_y"].get<std::string>());
 			double sense_theta = std::stod(j[1]["sense_theta"].get<std::string>());
-
-			pf.init(sense_x, sense_y, sense_theta, sigma_pos);
+            pf.init(sense_x, sense_y, sense_theta, sigma_pos);
 		  }
 		  else {
 			// Predict the vehicle's next state from previous (noiseless control) data.
 		  	double previous_velocity = std::stod(j[1]["previous_velocity"].get<std::string>());
 			double previous_yawrate = std::stod(j[1]["previous_yawrate"].get<std::string>());
-
 			pf.prediction(delta_t, sigma_pos, previous_velocity, previous_yawrate);
 		  }
 
@@ -112,7 +114,7 @@ int main()
 
 		  // Update the weights and resample
 		  pf.updateWeights(sensor_range, sigma_landmark, noisy_observations, map);
-		  pf.resample();
+          pf.resample();
 
 		  // Calculate and output the average weighted error of the particle filter over all time steps so far.
 		  vector<Particle> particles = pf.particles;
@@ -133,6 +135,7 @@ int main()
           json msgJson;
           msgJson["best_particle_x"] = best_particle.x;
           msgJson["best_particle_y"] = best_particle.y;
+            
           msgJson["best_particle_theta"] = best_particle.theta;
 
           //Optional message data used for debugging particle's sensing and associations
