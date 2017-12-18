@@ -74,8 +74,10 @@ void ParticleFilter::prediction(double delta_t,
         double pred_x;
         double pred_y;
         double pred_theta;
+        
+        cout << "[1] Will predict: " << particles[i].x << ", " << particles[i].y << ", " << particles[i].theta << " - yaw_rate: " << yaw_rate << endl;
 
-        if (yaw_rate < fabs(0.001)) {
+        if (fabs(yaw_rate) < 1e-10) {
             pred_x = particles[i].x + velocity * delta_t * cos(particles[i].theta);
             pred_y = particles[i].y + velocity * delta_t * sin(particles[i].theta);
             pred_theta = particles[i].theta;
@@ -95,7 +97,9 @@ void ParticleFilter::prediction(double delta_t,
         particles[i].y =  gauss_noise_y(gen);
         particles[i].theta =  gauss_noise_theta(gen);
         
-        cout << "Predicted: " << particles[i].x << ", " << particles[i].y << ", " << particles[i].theta << endl;
+        cout << "[2] Predicted: " << particles[i].x << ", " << particles[i].y << ", " << particles[i].theta << endl;
+        cout << "----------------------------------------" << endl;
+
         
     }
 }
@@ -239,7 +243,7 @@ void ParticleFilter::updateWeights(double sensor_range,
             
             double predicted_x = landmarks_within_range[oid].x;
             double predicted_y = landmarks_within_range[oid].y;
-                        
+            
             //cout << "obs: [" << ox << " " << oy << "]" << endl;
             //cout << "μ: [" << predicted_x << " " << predicted_y << "]" << endl;
             //cout << "ID: " << oid << endl;
@@ -340,8 +344,8 @@ string ParticleFilter::getAssociations(Particle best) {
 }
 
 /////////////////////////////////////////////////////////////
-//   resample
-////////getSenseX////////////////////////////////////////////////////
+//   getSenseX
+////////////////////////////////////////////////////////////
 string ParticleFilter::getSenseX(Particle best) {
 	vector<double> v = best.sense_x;
 	stringstream ss;
