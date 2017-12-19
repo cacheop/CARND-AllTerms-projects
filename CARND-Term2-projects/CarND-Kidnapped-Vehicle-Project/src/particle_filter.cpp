@@ -16,14 +16,13 @@
 
 using namespace std;
 
-const int NUM_PARTICLES = 10;
+const int NUM_PARTICLES = 100;
 static default_random_engine gen;
 
 /////////////////////////////////////////////////////////////
 //   init
 /////////////////////////////////////////////////////////////
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
-    
     //cout <<"---------------------Init ------------------------"<< endl;
     
     if (is_initialized) {
@@ -66,7 +65,7 @@ void ParticleFilter::prediction(double delta_t,
                                 double velocity,
                                 double yaw_rate) {
 	// Add measurements to each particle and add random Gaussian noise.
-    cout <<"---------------------Prediction Calc------------------------"<< endl;
+    //cout <<"---------------------Prediction Calc------------------------"<< endl;
 
     default_random_engine gen;
     for (int i = 0; i < num_particles; i++) {
@@ -74,8 +73,6 @@ void ParticleFilter::prediction(double delta_t,
         double pred_x;
         double pred_y;
         double pred_theta;
-        
-        cout << "[1] Will predict: " << particles[i].x << ", " << particles[i].y << ", " << particles[i].theta << " - yaw_rate: " << yaw_rate << endl;
 
         if (fabs(yaw_rate) < 1e-10) {
             pred_x = particles[i].x + velocity * delta_t * cos(particles[i].theta);
@@ -96,11 +93,6 @@ void ParticleFilter::prediction(double delta_t,
         particles[i].x =  gauss_noise_x(gen);
         particles[i].y =  gauss_noise_y(gen);
         particles[i].theta =  gauss_noise_theta(gen);
-        
-        cout << "[2] Predicted: " << particles[i].x << ", " << particles[i].y << ", " << particles[i].theta << endl;
-        cout << "----------------------------------------" << endl;
-
-        
     }
 }
 
@@ -226,27 +218,15 @@ void ParticleFilter::updateWeights(double sensor_range,
         //cout << "----STEP 4------------Weight Calculaction------------------------" << endl;
         
         double w = 1;
-        //vector<int> associations(obs_transformed.size());
-        //vector<double> sense_x(obs_transformed.size());
-        //vector<double> sense_y(obs_transformed.size());
-        
+
         for (int t = 0; t < obs_transformed.size(); t++)
         {
-            
             int oid = obs_transformed[t].id; //-1;
             double ox = obs_transformed[t].x;
             double oy = obs_transformed[t].y;
             
-            //associations[t] = oid;
-            //sense_x[t] = ox;
-            //sense_y[t] = oy;
-            
             double predicted_x = landmarks_within_range[oid].x;
             double predicted_y = landmarks_within_range[oid].y;
-            
-            //cout << "obs: [" << ox << " " << oy << "]" << endl;
-            //cout << "μ: [" << predicted_x << " " << predicted_y << "]" << endl;
-            //cout << "ID: " << oid << endl;
             
             double x_diff_square = pow((ox - predicted_x), 2);
             double y_diff_square = pow((oy - predicted_y), 2);
@@ -255,22 +235,15 @@ void ParticleFilter::updateWeights(double sensor_range,
             double exponent = x_diff_square / (2 * sig_x_square) + y_diff_square / (2 * sig_y_square);
             double prob = gauss_norm * exp(-exponent);
             
-            //cout << "~~~~ weight: " << w << " * " << prob << " = " <<  w*prob << endl;
             w *= prob;
-
         }
-        
-        //SetAssociations(p, associations, sense_x, sense_y);
         
         particles[i].weight = w;
         weights[i] = w;
-        
-        //cout << ">>>>> weight[" << i << "] = " << weights[i] << endl;
-    
+
     }
     
 }
-
 
 /////////////////////////////////////////////////////////////
 //   resample
@@ -303,7 +276,6 @@ void ParticleFilter::resample() {
         }
         new_particles.push_back(particles[index]);
     }
-    
     particles = new_particles;
 }
 
