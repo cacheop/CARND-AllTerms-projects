@@ -4,8 +4,8 @@
 #include "pid.h"
 #include <math.h>
 
-const bool running_tests = false;
-const double target_speed = 40;
+const bool running_tests = true;
+const double target_speed = 55;
 
 int count = 1501;
 int max_count = 1500;
@@ -43,7 +43,7 @@ int main()
     PID speed_control_pid = PID();
     PID steering_pid;
 
-    steering_pid.Init(0.13, 0., 3.0);
+    steering_pid.Init(0.15, 0.00, 6);
     speed_control_pid.Init(0.3, 0, 0.02);
     
     h.onMessage([&steering_pid, &speed_control_pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
@@ -66,28 +66,29 @@ int main()
                     //double angle = std::stod(j[1]["steering_angle"].get<std::string>());
                     
                     
+                    // Run multiple test cases to empirically test different hyperparameters
                     if (running_tests) {
                         if (count > max_count) {
                             count = 0;
                             switch (test_case) {
                                 case 0 :
-                                    steering_pid.Init(0.13, 0., 3.0);
+                                    steering_pid.Init(0.15, 0.00, 6);
                                     speed_control_pid.Init(0.3, 0, 0.02);
                                     break;
                                 case 1 :
-                                    steering_pid.Init(0.15, 0, 6);
+                                    steering_pid.Init(0.15,0.02, 3);
                                     speed_control_pid.Init(0.15, 0.0, .5);
                                     break;
                                 case 2 :
-                                    steering_pid.Init(0.15, 0, 5);
+                                    steering_pid.Init(0.15, 0.01, 3);
                                     speed_control_pid.Init(0.2, 0, .25);
                                     break;
                                 case 3 :
-                                    steering_pid.Init(0.15, 0, 4);
-                                    speed_control_pid.Init(0.15, 0, 0.1);
+                                    steering_pid.Init(0.15, 0.005, 3);
+                                        speed_control_pid.Init(0.15, 0, 0.1);
                                     break;
                                 case 4 :
-                                    steering_pid.Init(0.15, 0, 3);
+                                    steering_pid.Init(0.15, 0.002, 3);
                                     speed_control_pid.Init(0.15, 0, 0.05);
                                     max_count = 9999999999;
                                     break;
@@ -97,12 +98,14 @@ int main()
                         }
                     }
                     
+                    // Steering
                     double steer_value = 0.0;
                     steering_pid.UpdateError(cte);
                     steer_value = steering_pid.TotalError();
                     if (steer_value >  1.0) steer_value = 1.0;
                     if (steer_value < -1.0) steer_value = -1.0;
                     
+                    // Speed
                     double speed_error = speed - target_speed;
                     speed_control_pid.UpdateError(speed_error);
                     speed_value = speed_control_pid.TotalError();
@@ -111,7 +114,6 @@ int main()
                     
                     json msgJson;
                     msgJson["steering_angle"] = steer_value;
-                    //msgJson["throttle"] = 0.3;
                     msgJson["throttle"] = speed_value;
                     
                     auto msg = "42[\"steer\"," + msgJson.dump() + "]";
@@ -119,7 +121,6 @@ int main()
                     ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
                     
                     count++;
-                    
                 }
             }
             else {
