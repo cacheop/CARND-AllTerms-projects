@@ -41,11 +41,8 @@ double polyeval(Eigen::VectorXd coeffs, double x) {
     return result;
 }
 
-// Fit a polynomial.
-// Adapted from
-// https://github.com/JuliaMath/Polynomials.jl/blob/master/src/Polynomials.jl#L676-L716
-Eigen::VectorXd polyfit(Eigen::VectorXd xvals, Eigen::VectorXd yvals,
-                        int order) {
+// Fit a polynomial. Adapted from https://github.com/JuliaMath/Polynomials.jl/blob/master/src/Polynomials.jl#L676-L716
+Eigen::VectorXd polyfit(Eigen::VectorXd xvals, Eigen::VectorXd yvals, int order) {
     assert(xvals.size() == yvals.size());
     assert(order >= 1 && order <= xvals.size() - 1);
     Eigen::MatrixXd A(xvals.size(), order + 1);
@@ -98,27 +95,30 @@ int main() {
                     double steer_value = j[1]["steering_angle"];
                     double throttle_value = j[1]["throttle"];
                     
+                    // Rotation and translation so the reference system is centered on the origin with 0 degrees
                     for (int i = 0; i < ptsx.size(); i++) {
                         double shift_x = ptsx[i] - px;
                         double shift_y = ptsy[i] - py;
-                        
                         ptsx[i] = shift_x * cos(-psi) - shift_y * sin(-psi);
                         ptsy[i] = shift_x * sin(-psi) + shift_y * cos(-psi);
-                        
                     }
                     
+                    // Conversion to Eigen::VectorXd
                     double* ptrx = &ptsx[0];
-                    Eigen::Map<Eigen::VectorXd> ptsx_transform(ptrx, 6);
-                    
                     double* ptry = &ptsy[0];
+                    Eigen::Map<Eigen::VectorXd> ptsx_transform(ptrx, 6);
                     Eigen::Map<Eigen::VectorXd> ptsy_transform(ptry, 6);
                     
+                    // Find coeffs of a 3rd order polynomial
                     auto coeffs = polyfit(ptsx_transform, ptsy_transform, 3);
                     double cte = polyeval(coeffs, 0);
                     double epsi = -atan(coeffs[1]);
                     
+                    // Latency
                     const double delay_t = .1;
 
+                    // Future state considering latency into
+                    // x, y and psi = 0 zero after transformation to new reference system
                     double delay_x = v * delay_t;
                     double delay_y = 0;
                     double delay_psi = v * -steer_value / Lf * delay_t;
@@ -127,30 +127,20 @@ int main() {
                     double delay_epsi = epsi + v * -steer_value /Lf * delay_t;
                     
                 
+                    // State values
                     Eigen::VectorXd state(6);
                     state << delay_x, delay_y, delay_psi, delay_v, delay_cte, delay_epsi;
-
-                    /*
-                     * TODO: Calculate steering angle and throttle using MPC.
-                     *
-                     * Both are in between [-1, 1].
-                     *
-                     */
-                    
-                    // NOTE: Remember to di vide by deg2rad(25) before you send the steering value back.
-                    // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
                     
                     auto vars = mpc.Solve(state, coeffs);
 
                     double poly_inc = 2.5;
                     int num_points = 25;
                     
-                    //Display the MPC predicted trajectory
-                    // the points in the simulator are connected by a Green line
-
+                    // Display the MPC predicted trajectory connected by a Green line
                     vector<double> mpc_x_vals;
                     vector<double> mpc_y_vals;
                     
+                    // x's in odd positions in the vector, y's in even positions
                     for (int i = 2; i < vars.size(); i++) {
                         if(i % 2 == 0) {
                             mpc_x_vals.push_back(vars[i]);
@@ -161,9 +151,7 @@ int main() {
                     }
 
 
-                    //Display the waypoints/reference line
-                    // the points in the simulator are connected by a Yellow line
-
+                    // Display the waypoints/reference line connected by a Yellow line
                     vector<double> next_x_vals;
                     vector<double> next_y_vals;
                     
@@ -178,6 +166,7 @@ int main() {
                     double steer_value_norm = vars[0] / angle_norm_factor;
 
                     
+                    // Json data to be sent to simulator 
                     json msgJson;
                     msgJson["steering_angle"] = steer_value_norm;
                     msgJson["throttle"] = vars[1];
