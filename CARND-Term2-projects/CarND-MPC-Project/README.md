@@ -1,6 +1,14 @@
 # CarND-Controls-MPC
 Self-Driving Car Engineer Nanodegree Program
 
+
+[![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
+
+
+## Write up available here:
+[PID Control for self-driving](https://medium.com/@cacheop/implementing-a-model-predictive-control-for-a-self-driving-car-7ee6212a04a8)
+
+
 ---
 
 ## Dependencies
