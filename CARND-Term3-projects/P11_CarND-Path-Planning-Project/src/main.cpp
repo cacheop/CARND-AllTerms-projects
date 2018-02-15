@@ -284,7 +284,7 @@ int main() {
                         
                         int lane_car = fabs(check_car_d/4); // lane of car
                         
-                        if ((gap_front > 0) && (gap_front < 25)) { // car ahead and close
+                        if ((gap_front > 0) && (gap_front < 22)) { // car ahead and close
                             if (lane_car == lane) { // detected car is on the same lane
                                 too_close = true;
                             }
@@ -301,7 +301,7 @@ int main() {
                                 }
                             }
                         }
-                        else if ((gap_front < 0) && (gap_front > -15)) { // detected car behind and close
+                        else if ((gap_front < 0) && (gap_front > -7)) { // detected car behind and close
                             if (lane_car == (lane - 1)) { // detected car is on the left of ego
                                 free_left = false;
                             }
