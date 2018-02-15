@@ -284,7 +284,7 @@ int main() {
                         
                         int lane_car = fabs(check_car_d/4); // lane of car
                         
-                        if ((gap_front > 0) && (gap_front < 22)) { // car ahead and close
+                        if ((gap_front > 0) && (gap_front < 30)) { // car ahead and close
                             if (lane_car == lane) { // detected car is on the same lane
                                 too_close = true;
                             }
@@ -320,7 +320,7 @@ int main() {
                     if (too_close) { // needs to change lane
 
                         too_close = false;
-                        if (prev_gap >=  gap_front) { // avoids accordeon effect (brakes until far and then speeds again over & over)
+                        if (prev_gap > gap_front && gap_front < 7) { // avoids accordeon effect (brakes until far and then speeds again over & over)
                             ref_vel -= .224; // -5 m/s
                             prev_gap = gap_front;
                         }
