@@ -1,3 +1,0 @@
-/Users/albertoescarlate/Dropbox/Udacity/_SDC_ND013/CARND-AllTerms-projects/CARND-Term3-projects/P11_CarND-Path-Planning-Project/CMakeFiles/path_planning.dir
-/Users/albertoescarlate/Dropbox/Udacity/_SDC_ND013/CARND-AllTerms-projects/CARND-Term3-projects/P11_CarND-Path-Planning-Project/CMakeFiles/ALL_BUILD.dir
-/Users/albertoescarlate/Dropbox/Udacity/_SDC_ND013/CARND-AllTerms-projects/CARND-Term3-projects/P11_CarND-Path-Planning-Project/CMakeFiles/ZERO_CHECK.dir
