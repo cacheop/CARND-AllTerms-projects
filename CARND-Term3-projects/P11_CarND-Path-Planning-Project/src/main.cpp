@@ -436,10 +436,10 @@ int main() {
                     }
                     
                     // Create three more points. one is 30 the other is 60 and the final is 90 meters away from the car's location (until now the list has only 3 values)
-                    vector <double> next_wp0 = getXY(car_s+30, (2+4*lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
-                    vector <double> next_wp1 = getXY(car_s+60, (2+4*lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
-                    vector <double> next_wp2 = getXY(car_s+90, (2+4*lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
-                    
+                        vector <double> next_wp0 = getXY(car_s+30, (2+4*lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
+                        vector <double> next_wp1 = getXY(car_s+60, (2+4*lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
+                        vector <double> next_wp2 = getXY(car_s+90, (2+4*lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
+                        
                     ptsx.push_back(next_wp0[0]);
                     ptsx.push_back(next_wp1[0]);
                     ptsx.push_back(next_wp2[0]);
