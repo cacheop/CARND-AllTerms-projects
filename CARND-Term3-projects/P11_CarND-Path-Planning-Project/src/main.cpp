@@ -290,10 +290,12 @@ int main() {
                         
                         // project where the car might be in the future
                         check_car_s += ((double)prev_size * .02 * check_speed);
-                        int check_car_lane = fabs(check_car_d/4); // lane of car
+                        
+                        // lane of car
+                        int check_car_lane = fabs(check_car_d/4); 
+                        
                         // distance to the ego car on d-axis
                         gap = check_car_s - car_s;
-                        //gap = check_car_s - end_path_s;
                         
                         // check car in same lane as ego
                         if (check_car_lane == lane) {
@@ -301,6 +303,7 @@ int main() {
                                 lowest_gap_center = gap;
                             }
                         }
+                        
                         // check car to the right lane of ego
                         else if (check_car_lane == lane + 1) {
                             if ((gap > 0) && (lowest_gap_right_front > gap)) {
@@ -310,6 +313,7 @@ int main() {
                                 lowest_gap_right_rear = gap;
                             }
                         }
+                        
                         // check car to the left lane of ego
                        else if (check_car_lane == lane - 1) {
                             if ((gap > 0) && (lowest_gap_left_front > gap)) {
@@ -320,13 +324,18 @@ int main() {
                             }
                         }
 
-                        if ((lowest_gap_center > 0) && (lowest_gap_center < 30)) { // car ahead and close
+                        // car ahead and close
+                        if ((lowest_gap_center > 0) && (lowest_gap_center < 30)) {
                             too_close = true;
                         }
-                        if ((lowest_gap_left_front < 30) || (lowest_gap_left_rear > -7)) { // detected car is to the right
+                        
+                        // detected car is to the right
+                        if ((lowest_gap_left_front < 30) || (lowest_gap_left_rear > -7)) {
                             free_left = false; // careful, can't change to left lane
                         }
-                        if ((lowest_gap_right_front < 30) || (lowest_gap_right_rear > -7)) { // detected car is to the right
+                        
+                        // detected car is to the right
+                        if ((lowest_gap_right_front < 30) || (lowest_gap_right_rear > -7)) {
                             free_right = false; // careful, can't change to right lane
                         }
                     }
@@ -349,6 +358,7 @@ int main() {
                    // time to change lane
                     if (too_close) {
                         too_close = false;
+                        
                         // move from left to center lane
                         if ((lane == 0) && free_right) {
                             lane = 1;
@@ -357,8 +367,10 @@ int main() {
                         else if ((lane == 2) && free_left) {
                             lane = 1;
                         }
+                        
                        // center lane, decide which lane to go
                         else if (lane == 1) {
+                            
                             // both are open, choose the one with less traffic
                             if (free_left && free_right) {
                                 if (lowest_gap_right_front > lowest_gap_left_front) {
@@ -368,10 +380,12 @@ int main() {
                                     lane--;
                                 }
                             }
+                            
                             // just left is open
                             else if (free_left) {
                                     lane--;
                             }
+                            
                             // just right is open
                             else if (free_right) {
                                     lane++;
@@ -380,6 +394,7 @@ int main() {
                     
                         // hit the brakes
                         if (lowest_gap_center < 30) {
+                            
                             // avoids accordeon effect (brakes until far and then speeds again over & over)
                             if (prev_gap > lowest_gap_center) {
                                 ref_vel -= .224; // -5 m/s
@@ -387,9 +402,11 @@ int main() {
                             else {
                                 ref_vel -= .112; // -2.5 m/s
                             }
+                            
                             prev_gap = lowest_gap_center;
                         }
                     }
+                    
                     // all clear ahead, add +5 m/s until approach cruise speed
                     else if (ref_vel < 49.5) {
                         ref_vel += .224;
